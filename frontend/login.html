@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #f0f2f5;
+        }
+
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.7rem;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        #captcha {
+            background: #eee;
+            padding: 0.5rem;
+            text-align: center;
+            font-family: monospace;
+            font-size: 1.2rem;
+            letter-spacing: 3px;
+            margin: 0.5rem 0;
+        }
+
+        .toggle {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #007bff;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2 id="title">Login</h2>
+        <input id="email" placeholder="Email">
+        <input id="password" type="password" placeholder="Password">
+        <div id="captcha"></div>
+        <input id="captchaInput" placeholder="Enter captcha">
+        <button onclick="handleSubmit()" id="submit-btn">Login</button>
+        <div class="toggle" onclick="toggleMode()" id="toggle-text">Need an account? Signup</div>
+        <div class="toggle" style="margin-top: 0.5rem;">
+            <a href="/forgot-password.html" style="text-decoration: none; color: #6c757d; font-size: 0.8rem;">Forgot
+                Password?</a>
+        </div>
+    </div>
+
+    <script>
+        let isLogin = true;
+
+        fetch("/captcha").then(r => r.json()).then(d =>
+            document.getElementById("captcha").innerText = d.captcha
+        );
+
+        function toggleMode() {
+            isLogin = !isLogin;
+            document.getElementById('title').innerText = isLogin ? 'Login' : 'Signup';
+            document.getElementById('submit-btn').innerText = isLogin ? 'Login' : 'Signup';
+            document.getElementById('toggle-text').innerText = isLogin ? 'Need an account? Signup' : 'Already have an account? Login';
+        }
+
+        function handleSubmit() {
+            const endpoint = isLogin ? "/login" : "/signup";
+            fetch(endpoint, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    email: document.getElementById("email").value,
+                    password: document.getElementById("password").value,
+                    captcha: document.getElementById("captchaInput").value
+                })
+            })
+                .then(r => {
+                    if (r.ok) {
+                        if (isLogin) {
+                            return r.json().then(() => window.location.href = "/dashboard");
+                        } else {
+                            return r.text().then(alert).then(() => toggleMode());
+                        }
+                    } else {
+                        return r.text().then(alert);
+                    }
+                })
+                .catch(alert);
+        }
+    </script>
+</body>
+
+</html>

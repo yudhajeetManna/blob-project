@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./blob-storage:/app/blob-storage
+      - ./backend:/app/backend
+      - ./frontend:/app/frontend
+    container_name: final-project-app

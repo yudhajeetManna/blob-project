@@ -1,0 +1,5 @@
+node_modules
+blob-storage/uploads/*
+!blob-storage/uploads/.gitkeep
+.env
+.DS_Store
